@@ -181,7 +181,7 @@ static zend_function_entry php_simplate_functions[] = {
  *
  * Every user visible function must have an entry in simplate_functions[].
  */
-function_entry simplate_functions[] = {
+zend_function_entry simplate_functions[] = {
     {NULL, NULL, NULL} /* Must be the last line in simplate_functions[] */
 };
 /* }}} */
@@ -1045,10 +1045,6 @@ create_cache:
 
             SIMPLATE_G(global_string.str(std::string())); // let global_string empty.
             int (*old_output_func)(const char*, unsigned int TSRMLS_DC);
-            old_output_func = OG(php_body_write);
-            OG(php_body_write) = php_my_output_func;
-            zend_execute(op_array TSRMLS_CC);
-            OG(php_body_write) = old_output_func;
 
 #ifdef ZEND_ENGINE_2
             destroy_op_array(op_array TSRMLS_CC);
@@ -2041,7 +2037,7 @@ DEBUG_PRINTF("%s", "start function");
     zval *output_handler = NULL;
     zend_bool erase = 1;
     long chunk_size = 0;
-    if (php_start_ob_buffer(output_handler, chunk_size, erase TSRMLS_CC) == FAILURE) {
+    if (php_output_start_default(TSRMLS_C) == FAILURE) {
         zend_error(E_ERROR, "Error: fail to ob_start");
         RETURN_FALSE;
     }
@@ -2058,10 +2054,10 @@ DEBUG_PRINTF("%s", "start function");
 #endif // ZEND_ENGINE_2
     efree(op_array);
     efree(fullfile_name);
-    if (php_ob_get_buffer(return_value TSRMLS_CC) == FAILURE) {
+    if (php_output_get_contents(return_value TSRMLS_CC) == FAILURE) {
         RETURN_FALSE;
     }
-    php_end_ob_buffer(0, 0 TSRMLS_CC);
+    php_output_clean(TSRMLS_C);
 #endif // USE_ZEND_EXECUTE
 
 DEBUG_PRINTF("%s", "end function");

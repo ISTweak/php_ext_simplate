@@ -1,13 +1,6 @@
-// $Id$
-// vim:ft=javascript
+ARG_ENABLE('simplate' , 'PHP_SIMPLATE support', 'no');
 
-// If your extension references something external, use ARG_WITH
-// ARG_WITH("simplate", "for simplate support", "no");
-
-// Otherwise, use ARG_ENABLE
-// ARG_ENABLE("simplate", "enable simplate support", "no");
-
-if (PHP_simplate != "no") {
-	EXTENSION("simplate", "simplate.cpp");
+if (PHP_SIMPLATE != "no") {
+	EXTENSION("simplate", "simplate.cpp", true);
 }
 
